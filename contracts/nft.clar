@@ -1,30 +1,42 @@
+;; nft.clar
+;; NFT Contract for minting and managing NFTs
 
-;; title: nft
-;; version:
-;; summary:
-;; description:
+(define-non-fungible-token nft-token uint)
 
-;; traits
-;;
+(define-data-var last-token-id uint u0)
 
-;; token definitions
-;;
+(define-constant contract-owner tx-sender)
 
-;; constants
-;;
+(define-map token-metadata
+  uint
+  {creator: principal, royalty: uint}
+)
 
-;; data vars
-;;
+(define-read-only (get-last-token-id)
+  (var-get last-token-id)
+)
 
-;; data maps
-;;
+(define-read-only (get-token-metadata (token-id uint))
+  (map-get? token-metadata token-id)
+)
 
-;; public functions
-;;
+(define-public (mint (metadata (string-utf8 500)) (royalty uint))
+  (let
+    (
+      (token-id (+ (var-get last-token-id) u1))
+    )
+    (asserts! (is-eq tx-sender contract-owner) (err u100))
+    (asserts! (<= royalty u1000) (err u101)) ;; Max royalty is 10%
+    (try! (nft-mint? nft-token token-id tx-sender))
+    (map-set token-metadata token-id {creator: tx-sender, royalty: royalty})
+    (var-set last-token-id token-id)
+    (ok token-id)
+  )
+)
 
-;; read only functions
-;;
-
-;; private functions
-;;
-
+(define-public (transfer (token-id uint) (sender principal) (recipient principal))
+  (begin
+    (asserts! (is-eq tx-sender sender) (err u102))
+    (nft-transfer? nft-token token-id sender recipient)
+  )
+)
