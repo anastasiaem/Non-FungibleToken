@@ -1,21 +1,43 @@
+import { describe, it, expect } from 'vitest'
+import { readFileSync } from 'fs'
 
-import { describe, expect, it } from "vitest";
+const contractSource = readFileSync('./contracts/auction.clar', 'utf8')
 
-const accounts = simnet.getAccounts();
-const address1 = accounts.get("wallet_1")!;
+describe('Auction Contract', () => {
+  it('should define auctions map', () => {
+    expect(contractSource).toContain('(define-map auctions')
+  })
+  
+  it('should define last-auction-id variable', () => {
+    expect(contractSource).toContain('(define-data-var last-auction-id uint u0)')
+  })
+  
+  it('should have a get-auction function', () => {
+    expect(contractSource).toContain('(define-read-only (get-auction (auction-id uint))')
+  })
+  
+  it('should have a create-auction function', () => {
+    expect(contractSource).toContain('(define-public (create-auction (token-id uint) (duration uint))')
+  })
+  
+  it('should have a place-bid function', () => {
+    expect(contractSource).toContain('(define-public (place-bid (auction-id uint) (bid-amount uint))')
+  })
+  
+  it('should have an end-auction function', () => {
+    expect(contractSource).toContain('(define-public (end-auction (auction-id uint))')
+  })
+  
+  it('should check for auction end in place-bid function', () => {
+    expect(contractSource).toContain('(asserts! (< block-height (get end-block auction)) (err u401))')
+  })
+  
+  it('should check for higher bid in place-bid function', () => {
+    expect(contractSource).toContain('(asserts! (> bid-amount current-highest-bid) (err u402))')
+  })
+  
+  it('should check for auction end in end-auction function', () => {
+    expect(contractSource).toContain('(asserts! (>= block-height (get end-block auction)) (err u403))')
+  })
+})
 
-/*
-  The test below is an example. To learn more, read the testing documentation here:
-  https://docs.hiro.so/stacks/clarinet-js-sdk
-*/
-
-describe("example tests", () => {
-  it("ensures simnet is well initalised", () => {
-    expect(simnet.blockHeight).toBeDefined();
-  });
-
-  // it("shows an example", () => {
-  //   const { result } = simnet.callReadOnlyFn("counter", "get-counter", [], address1);
-  //   expect(result).toBeUint(0);
-  // });
-});

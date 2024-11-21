@@ -9,3 +9,9 @@ J
 contracts/marketplace.clar,e/2/e2a45a6789a1d0483fc133fffb49ff482a2e137b
 9
 	README.md,8/e/8ec9a00bfd09b3190ac6b22251dbb1aa95a0579d
+E
+tests/auction.test.ts,c/6/c69afdfbe1ab00c57111ad060d08fa1d5366dd49
+A
+tests/nft.test.ts,f/b/fb6d9179f04080bf46ba7a1de23da5e78cd82280
+I
+tests/marketplace.test.ts,9/5/95227c39b395fbc864f16d5183388b838084c883
